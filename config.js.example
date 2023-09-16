@@ -1,0 +1,11 @@
+module.exports = {
+    privateKey: '',
+    port: 5500,
+    db: {
+        host: '',
+        user: '',
+        password: '',
+        port: '',
+        database: '',
+    },
+}
