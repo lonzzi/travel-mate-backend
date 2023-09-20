@@ -14,7 +14,7 @@ const register = (req, res) => {
             'insert into T_ADMIN (account, pic, sex, phone, password, birthday, create_time) values (?, ?, ?, ?, ?, ?, ?)',
             [
                 account,
-                pic,
+                pic == '' ? 'https://gravatar.loli.net/avatar/ef4cba8937673221349b1d0f01eebeef' : pic,
                 sex,
                 phone,
                 password,
