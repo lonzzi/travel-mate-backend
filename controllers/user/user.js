@@ -113,6 +113,8 @@ const getUserInfoById = (req, res) => {
                             followers: ret[1][0].cnt,
                             birthday: info.birthday,
                             home: info.home,
+                            job: info.job,
+                            emotion: info.emotion,
                         },
                         msg: 'ok',
                     })
