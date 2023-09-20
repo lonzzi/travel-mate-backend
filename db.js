@@ -1,4 +1,6 @@
 const mysql = require('mysql')
 const dbConfig = require('./config').db
 
-module.exports = mysql.createConnection(dbConfig)
+const connection = mysql.createConnection(dbConfig)
+
+module.exports = connection

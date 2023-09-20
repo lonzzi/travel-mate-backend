@@ -1,38 +1,51 @@
-const conn = require('../../db')
 const jwt = require('../../lib/jwt')
+const query = require('../../lib/dao/query')
 
 const register = (req, res) => {
-    const { phone, password } = req.body
+    // console.log(req.body)
+    const { account, pic, sex, phone, password, birthday } = req.body
     if (phone == '' || password == '') {
         res.json({
             code: 500,
             msg: '手机或密码不能为空',
         })
     } else {
-        conn.query(
-            'insert into T_ADMIN (account, phone, password, create_time) values (?, ?, ?, ?)',
-            [phone, phone, password, new Date()],
-            (err, ret) => {
-                if (err) {
-                    res.json({
-                        code: 500,
-                        msg: '创建账号发生错误, ' + err,
-                    })
-                    return
-                }
+        query(
+            'insert into T_ADMIN (account, pic, sex, phone, password, birthday, create_time) values (?, ?, ?, ?, ?, ?, ?)',
+            [
+                account,
+                pic,
+                sex,
+                phone,
+                password,
+                new Date(birthday[0], birthday[1] - 1, birthday[2]),
+                new Date(),
+            ]
+        )
+            .then((value) => {
+                // console.log(value)
                 const token = jwt.generateToken({
                     phone,
+                    id: value.insertId,
                 })
                 res.json({
                     code: 1,
                     data: {
                         phone,
+                        id: value.insertId,
                         token: 'Bearer ' + token,
                     },
                     msg: '注册成功',
                 })
-            }
-        )
+                return
+            })
+            .catch((err) => {
+                res.json({
+                    code: 500,
+                    msg: '创建账号发生错误, ' + err,
+                })
+                return
+            })
     }
 }
 
@@ -44,18 +57,8 @@ const login = (req, res) => {
             msg: '手机或密码不能为空',
         })
     } else {
-        conn.query(
-            'select * from T_ADMIN where phone = ? limit 1',
-            [phone],
-            (err, ret, fileds) => {
-                if (err) {
-                    res.json({
-                        code: 500,
-                        msg: '登录时发生错误, ' + err,
-                    })
-                    console.log(err)
-                    return
-                }
+        query('select * from T_ADMIN where phone = ? limit 1', [phone])
+            .then((ret) => {
                 if (ret.length == 0) {
                     res.json({
                         code: 500,
@@ -73,17 +76,27 @@ const login = (req, res) => {
                 }
                 const token = jwt.generateToken({
                     phone,
+                    id: ret[0].admin_id,
                 })
                 res.json({
                     code: 1,
                     data: {
+                        id: ret[0].admin_id,
                         phone,
                         token: 'Bearer ' + token,
                     },
                     msg: '登录成功',
                 })
-            }
-        )
+            })
+            .catch((err) => {
+                if (err) {
+                    res.json({
+                        code: 500,
+                        msg: '登录时发生错误, ' + err,
+                    })
+                    console.log(err)
+                }
+            })
     }
 }
 
